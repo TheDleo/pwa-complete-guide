@@ -10,7 +10,7 @@ function openCreatePostModal() {
 	if (deferredPrompt) {
 		deferredPrompt.prompt();
 
-		deferredPrompt.userChoice.then(function(choiceResult) {
+		deferredPrompt.userChoice.then(function (choiceResult) {
 			console.log(choiceResult.outcome);
 
 			if (choiceResult.outcome === 'dismissed') {
@@ -22,6 +22,13 @@ function openCreatePostModal() {
 
 		deferredPrompt = null;
 	}
+	// code for unregistering a serviceWorker
+	// if ('serviceWorker' in navigator) {
+	// 	navigator.serviceWorker.getRegistrations()
+	// 		.then((registrations) => {
+	// 			registrations.forEach(registration => registration.unregister());
+	// 		});
+	// }
 }
 
 function closeCreatePostModal() {
@@ -79,10 +86,10 @@ var url = 'https://httpbin.org/get';
 var networkDataReceived = false;
 
 fetch(url)
-	.then(function(res) {
+	.then(function (res) {
 		return res.json();
 	})
-	.then(function(data) {
+	.then(function (data) {
 		networkDataReceived = true;
 		clearCards();
 		createCard();
@@ -91,12 +98,12 @@ fetch(url)
 if ('caches' in window) {
 	caches
 		.match(url)
-		.then(function(response) {
+		.then(function (response) {
 			if (response) {
 				return response.json();
 			}
 		})
-		.then(function(data) {
+		.then(function (data) {
 			if (!networkDataReceived) {
 				clearCards();
 				createCard();
