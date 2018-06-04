@@ -74,7 +74,7 @@ function isInArray(string, array) {
 
 self.addEventListener('fetch', function (event) {
 
-  var url = 'https://httpbin.org/get';
+  var url = 'https://pwagram-24227.firebaseio.com/posts';
   //cache with network
   if (event.request.url.indexOf(url) > -1) {
     event.respondWith(
