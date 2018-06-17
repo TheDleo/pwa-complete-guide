@@ -1,28 +1,33 @@
-const CACHE_STATIC_NAME = 'static-v4';
+importScripts('/src/js/idb.js');
+importScripts('/src/js/utility.js');
+
+const CACHE_STATIC_NAME = 'static-v5';
 const CACHE_DYNAMIC_NAME = 'dynamic-v2';
+const STATIC_FILES = [
+  '/',
+  '/manifest.json',
+  '/index.html',
+  '/offline.html',
+  '/src/js/app.js',
+  '/src/js/feed.js',
+  '/src/js/idb.js',
+  '/src/js/fetch.js',
+  '/src/js/promise.js',
+  '/src/js/material.min.js',
+  '/src/css/app.css',
+  '/src/css/feed.css',
+  '/src/images/main-image.jpg',
+  'https://fonts.googleapis.com/css?family=Roboto:400,700',
+  'https://fonts.googleapis.com/icon?family=Material+Icons',
+  'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css'
+];
 
 self.addEventListener('install', function (event) {
   console.log('[Service Worker] Installing Service Worker ...', event);
   event.waitUntil(
     caches.open(CACHE_STATIC_NAME).then((cache) => {
       console.log('[Service Worker] pre-caching');
-      cache.addAll([
-        '/',
-        '/manifest.json',
-        '/index.html',
-        '/offline.html',
-        '/src/js/app.js',
-        '/src/js/feed.js',
-        '/src/js/fetch.js',
-        '/src/js/promise.js',
-        '/src/js/material.min.js',
-        '/src/css/app.css',
-        '/src/css/feed.css',
-        '/src/images/main-image.jpg',
-        'https://fonts.googleapis.com/css?family=Roboto:400,700',
-        'https://fonts.googleapis.com/icon?family=Material+Icons',
-        'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css'
-      ]);
+      cache.addAll(STATIC_FILES);
     })
   );
 });
@@ -74,23 +79,20 @@ function isInArray(string, array) {
 
 self.addEventListener('fetch', function (event) {
 
-  var url = 'https://pwagram-24227.firebaseio.com/posts';
+  var url = 'https://pwagram-24227.firebaseio.com/posts.json';
   //cache with network
   if (event.request.url.indexOf(url) > -1) {
-    event.respondWith(
-      caches
-        .open(CACHE_DYNAMIC_NAME)
-        .then(function (cache) {
-          return fetch(event.request).then(function (res) {
-            // console.log('call trimCache1');
-            // trimCache(CACHE_DYNAMIC_NAME, 10);
-            cache.put(event.request, res.clone());
-            return res;
+    event.respondWith(fetch(event.request)
+      .then(function (res) {
+        var clonedRes = res.clone();
+        clonedRes.json()
+          .then(function (data) {
+            for (var key in data) {
+              writeData('posts', data[key]);
+            }
           });
-        })
-        .catch(function (err) {
-          // do nothing I guess
-        })
+        return res;
+      })
     );
   } else {
     //cache with network fallback
