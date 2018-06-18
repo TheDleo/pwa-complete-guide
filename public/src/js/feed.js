@@ -109,17 +109,12 @@ fetch(url)
     updateUI(objToArray(data));
   });
 
-if ('caches' in window) {
-  caches
-    .match(url)
-    .then(function (response) {
-      if (response) {
-        return response.json();
-      }
-    })
+if ('indexedDB' in window) {
+  readAllData('posts')
     .then(function (data) {
       if (!networkDataReceived) {
-        updateUI(objToArray(data));
+        console.log('From cache', data);
+        updateUI(data);
       }
-    });
+    })
 }
